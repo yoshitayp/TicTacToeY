@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe - Yoshita</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1f1f3a, #2a2a55);
+  color: white;
+}
+
+/* MAIN CARD */
+.container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  padding: 35px;
+  border-radius: 20px;
+  width: 380px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+/* HEADER */
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+/* BOARD (BIGGER NOW) */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 110px);
+  gap: 14px;
+  justify-content: center;
+}
+
+.cell {
+  width: 110px;
+  height: 110px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 14px;
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cell:hover {
+  background: rgba(255,255,255,0.18);
+  transform: scale(1.07);
+}
+
+/* WIN STYLE */
+.win {
+  background: #4caf50 !important;
+  animation: glow 0.8s infinite alternate;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 10px #4caf50; }
+  to { box-shadow: 0 0 25px #00ffc3; }
+}
+
+/* STATUS */
+.status {
+  margin-top: 18px;
+  font-size: 1.1rem;
+}
+
+/* BUTTON */
+button {
+  margin-top: 14px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 10px;
+  background: #ff4c60;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.07);
+  background: #ff2e45;
+}
+
+/* WIN BANNER */
+.banner {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #00ffc3, #4caf50);
+  color: black;
+  font-weight: bold;
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* FOOTER */
+.footer {
+  margin-top: 22px;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.github {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+  text-decoration: none;
+  color: #00d4ff;
+}
+
+.github img {
+  width: 18px;
+  filter: invert(1);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🎮 Tic Tac Toe</h1>
+  <div class="subtitle">Player X vs Player O</div>
+
+  <div class="board" id="board"></div>
+
+  <div class="status" id="status">Turn: X</div>
+  <div class="banner" id="banner"></div>
+
+  <button onclick="resetGame()">Restart Game</button>
+
+  <div class="footer">
+    Made by <strong>Yoshita</strong> 👩‍🎓 (Student Project)
+    
+    <a class="github" href="https://github.com/yoshitayp" target="_blank">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg">
+      yoshitayp
+    </a>
+  </div>
+
+</div>
+
+<script>
+const board = document.getElementById("board");
+const statusText = document.getElementById("status");
+const banner = document.getElementById("banner");
+
+let cells = ["", "", "", "", "", "", "", "", ""];
+let currentPlayer = "X";
+let gameActive = true;
+
+const winConditions = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+function createBoard() {
+  board.innerHTML = "";
+  cells.forEach((cell, i) => {
+    const div = document.createElement("div");
+    div.classList.add("cell");
+    div.dataset.index = i;
+    div.innerText = cell;
+    div.onclick = handleClick;
+    board.appendChild(div);
+  });
+}
+
+function handleClick(e) {
+  const i = e.target.dataset.index;
+
+  if (cells[i] || !gameActive) return;
+
+  cells[i] = currentPlayer;
+  e.target.innerText = currentPlayer;
+
+  checkWinner();
+
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+
+  if (gameActive) statusText.innerText = "Turn: " + currentPlayer;
+}
+
+function checkWinner() {
+  for (let combo of winConditions) {
+    const [a,b,c] = combo;
+
+    if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
+      gameActive = false;
+
+      document.querySelectorAll(".cell")[a].classList.add("win");
+      document.querySelectorAll(".cell")[b].classList.add("win");
+      document.querySelectorAll(".cell")[c].classList.add("win");
+
+      banner.style.display = "block";
+      banner.innerText = "🎉 Player " + currentPlayer + " Wins!";
+      statusText.innerText = "";
+
+      return;
+    }
+  }
+
+  if (!cells.includes("")) {
+    gameActive = false;
+    banner.style.display = "block";
+    banner.innerText = "It's a Draw!";
+    statusText.innerText = "";
+  }
+}
+
+function resetGame() {
+  cells = ["","","","","","","","",""];
+  currentPlayer = "X";
+  gameActive = true;
+
+  banner.style.display = "none";
+  statusText.innerText = "Turn: X";
+
+  createBoard();
+}
+
+createBoard();
+</script>
+
+</body>
+</html>
