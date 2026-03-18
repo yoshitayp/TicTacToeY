@@ -5,7 +5,7 @@ A simple and interactive Tic Tac Toe web application built using HTML, CSS, and 
 ## Live Demo
 
 You can play the game here:
-[Live Demo Link](https://your-username.github.io/your-repo-name/)
+[Live Demo Link](https://yoshitayp.github.io/TicTacToeY/)
 
 ## Features
 
